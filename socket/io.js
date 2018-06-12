@@ -24,10 +24,10 @@ module.exports = function (io) {
                 socket.emit('created', room, socket.id);
             } else if(numClients === 1){
                 log('Client ID '+ socket.id + ' created.room ' + room);
-                io.sockets.in(room).emit('join ', room);
+                io.to(room).emit('join', room);
                 socket.join(room);
-                socket.emit('joined ', room, socket.id);
-                io.sockets.in(room).emit('ready');
+                socket.emit('joined', room, socket.id);
+                io.to(room).emit('ready');
             } else {
                 console.log("emit full signal");
                 socket.emit('full', room);

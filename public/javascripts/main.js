@@ -66,6 +66,12 @@ socket.on("full", function (room) {
     console.log('Message from client: Room '+ room+ 'is full: ^(');
 });
 
+socket.on('join', function (room){
+    console.log('Another peer made a request to join room ' + room);
+    console.log('This peer is the initiator of room ' + room + '!');
+    isChannelReady = true;
+});
+
 socket.on("created", function (room, clientId) {
     console.log('created room '+ room);
     isInitiator = true;
@@ -77,7 +83,7 @@ socket.on("ipaddr", function (ipaddr) {
 
 socket.on('joined', function (room, clientId) {
     console.log('joined: ' + room);
-    isInitiator = false;
+    isChannelReady = true;
 });
 
 socket.on('log', function (array) {
@@ -92,7 +98,7 @@ function sendMessage(message) {
 socket.on('message', function (message) {
     console.log('Client received message: ', message);
     if(message === "got user media"){
-
+        maybeStart();
     }else if(message.type == "candidate" && isStarted){
         var candidate = new RTCIceCandidate({
             sdpMLineIndex: message.label,
@@ -103,9 +109,12 @@ socket.on('message', function (message) {
         if(!isInitiator && !isStarted){
             maybeStart();
         }
+        console.log('set remote description in offer');
+        console.log(pc);
         pc.setRemoteDescription(new RTCSessionDescription(message));
         doAnswer();
     } else if(message.type === 'answer' && isStarted){
+        console.log('set remote description in answer');
         pc.setRemoteDescription(new RTCSessionDescription(message));
     } else if(message === 'bye' && isStarted){
         handleRemoteHangup();
@@ -120,9 +129,9 @@ navigator.mediaDevices.getUserMedia({
     video:true
 }).then(function (stream) {
     console.log('Adding local stream. ');
-    localVideo.src = window.URL.createObjectURL(stream);
+    localVideo.srcObject = stream;
     localStream = stream;
-    sendMessage('got user media');
+    sendMessage("got user media");
     if(isInitiator){
         maybeStart();
     }
@@ -185,7 +194,7 @@ function handleIceCandidate(event) {
 
 function handleRemoteStreamAdded(event) {
     console.log('Remote stream added.');
-    remoteVideo.src = window.URL.createObjectURL(event.stream);
+    remoteVideo.srcObject = event.stream;
     remoteStream = event.stream;
 }
 
