@@ -125,7 +125,7 @@ var localVideo = document.getElementById("localVideo");
 var remoteVideo = document.getElementById("remoteVideo");
 
 navigator.mediaDevices.getUserMedia({
-    audio:false,
+    audio:true,
     video:true
 }).then(function (stream) {
     console.log('Adding local stream. ');
