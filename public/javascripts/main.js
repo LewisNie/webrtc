@@ -52,8 +52,8 @@ var sdpConstraints = {
     offerToReceiveVideo:true
 };
 
-var room = 'foo';
-//window.room = prompt("Enter room name: ");
+// var room = 'foo';
+window.room = prompt("Enter room name: ");
 
 var socket = io.connect();
 
@@ -64,6 +64,7 @@ if(room !== ""){
 
 socket.on("full", function (room) {
     console.log('Message from client: Room '+ room+ 'is full: ^(');
+    alert('Room is full');
 });
 
 socket.on('join', function (room){
